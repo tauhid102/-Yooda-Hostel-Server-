@@ -60,6 +60,25 @@ async function run() {
         foods,
       });
     });
+    // fetch served by id
+    app.get("/served", async (req, res) => {
+      const cursor = servedCollection.find({});
+      const page = parseInt(req.query.page);
+      let serveds;
+      const count = await cursor.count();
+      if (page >= 0) {
+        serveds = await cursor
+          .skip(page * 10)
+          .limit(10)
+          .toArray();
+      } else {
+        serveds = await cursor.toArray();
+      }
+      res.send({
+        count,
+        serveds,
+      });
+    });
     //delete food
     app.delete("/foods/:id", async (req, res) => {
       const id = req.params.id;
@@ -99,11 +118,12 @@ async function run() {
       const result = await foodsCollection.findOne(query);
       res.send(result);
     });
-    // fetch served by id
-    app.get('/served', async (req, res) => {
-        const cursor = servedCollection.find({});
-        const books = await cursor.toArray();
-        res.send(books);
+    //find served
+    app.get("/served/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = id;
+      const result = await servedCollection.findOne(query);
+      res.send(result);
     });
     // fetch by id
     app.get("/students/:id", async (req, res) => {
